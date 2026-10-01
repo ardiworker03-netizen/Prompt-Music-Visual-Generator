@@ -7,8 +7,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="AI Video Prompt Generator for looping music videos">
+    
+    <!-- Link to PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://placehold.co/192x192/ec4899/ffffff?text=PG">
+    
     <title>JSON Prompt Generator - Pro Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -210,7 +213,7 @@
             <div id="loadingOverlay" class="absolute inset-0 bg-gray-900/90 backdrop-blur-sm z-10 hidden flex-col items-center justify-center transition-opacity duration-300">
                 <div class="spinner mb-4"></div>
                 <h3 class="text-lg font-semibold text-pink-400 mb-1">Generating Prompt...</h3>
-                <p class="text-sm text-gray-500">Assembling 4 random texts & parameters</p>
+                <p class="text-sm text-gray-500">Assembling texts & parameters</p>
             </div>
 
             <!-- Code Display -->
@@ -220,32 +223,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Setup Virtual Manifest.json
-            const manifestData = {
-                "name": "JSON Prompt Gen Pro",
-                "short_name": "PromptGen",
-                "description": "Generate AI Video Prompts easily",
-                "start_url": ".",
-                "display": "standalone",
-                "background_color": "#111827",
-                "theme_color": "#1f2937",
-                "icons": [
-                    {
-                        "src": "https://placehold.co/192x192/ec4899/ffffff?text=PG",
-                        "sizes": "192x192",
-                        "type": "image/png"
-                    },
-                    {
-                        "src": "https://placehold.co/512x512/ec4899/ffffff?text=PG",
-                        "sizes": "512x512",
-                        "type": "image/png"
-                    }
-                ]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-            const manifestUrl = URL.createObjectURL(manifestBlob);
-            document.getElementById('manifest-link').setAttribute('href', manifestUrl);
-
+            
+            // 1. PWA Service Worker Registration
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('./sw.js')
@@ -258,6 +237,7 @@
                 });
             }
 
+            // 2. Element References
             const generateBtn = document.getElementById('generateBtn');
             const copyBtn = document.getElementById('copyBtn');
             const jsonOutput = document.getElementById('jsonOutput');
@@ -287,7 +267,6 @@
                     return "vibrant abstract modern studio set with colorful pastel gradients and soft studio softbox lighting";
                 }
                 
-                // Fallback for unknown styles
                 return "immersive abstract visualizer environment perfectly matching the music's aesthetic, with dynamic atmospheric mood lighting";
             };
 
@@ -352,35 +331,32 @@
                 return JSON.stringify(data, null, 2);
             };
 
-            // Initial generation
+            // Initial generation on load
             jsonOutput.textContent = generateJSONData();
 
+            // Generate Button Click Event
             generateBtn.addEventListener('click', () => {
-                // Remove fade class briefly
                 jsonOutput.classList.remove('fade-enter-active');
                 jsonOutput.classList.add('fade-enter');
                 
-                // Show Loader
                 loadingOverlay.classList.remove('hidden');
                 loadingOverlay.classList.add('flex');
 
                 setTimeout(() => {
-                    // Generate new JSON
                     const newJson = generateJSONData();
                     jsonOutput.textContent = newJson;
                     
-                    // Hide Loader
                     loadingOverlay.classList.add('hidden');
                     loadingOverlay.classList.remove('flex');
 
-                    // Apply fade in
                     setTimeout(() => {
                         jsonOutput.classList.add('fade-enter-active');
                     }, 50);
 
-                }, 1200); // 1.2 second loading animation
+                }, 1200); 
             });
 
+            // Copy Button Logic
             copyBtn.addEventListener('click', () => {
                 const textToCopy = jsonOutput.textContent;
                 const textArea = document.createElement("textarea");
