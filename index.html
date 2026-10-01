@@ -246,33 +246,16 @@
             const manifestUrl = URL.createObjectURL(manifestBlob);
             document.getElementById('manifest-link').setAttribute('href', manifestUrl);
 
-            // 2. Setup Virtual Service Worker
             if ('serviceWorker' in navigator) {
-                const swCode = `
-                    const CACHE_NAME = 'prompt-gen-v1';
-                    self.addEventListener('install', (event) => {
-                        self.skipWaiting();
-                        console.log('[ServiceWorker] Install');
-                    });
-                    self.addEventListener('activate', (event) => {
-                        console.log('[ServiceWorker] Activate');
-                        return self.clients.claim();
-                    });
-                    self.addEventListener('fetch', (event) => {
-                        // Simple network-first strategy for preview purposes
-                        event.respondWith(fetch(event.request).catch(() => new Response('Offline mode not fully supported in virtual preview.')));
-                    });
-                `;
-                const swBlob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(swBlob);
-                
-                navigator.serviceWorker.register(swUrl)
-                    .then(registration => {
-                        console.log('Service Worker registered successfully with scope:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.error('Service Worker registration failed:', error);
-                    });
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed: ', err);
+                        });
+                });
             }
 
             const generateBtn = document.getElementById('generateBtn');
