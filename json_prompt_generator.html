@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1f2937">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="AI Video Prompt Generator for looping music videos">
+    <link rel="manifest" id="manifest-link">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/ec4899/ffffff?text=PG">
+    <title>JSON Prompt Generator - Pro Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for side panel and code block */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827; /* gray-900 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151; /* gray-700 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563; /* gray-600 */
+        }
+        
+        /* Pulse animation for copy success */
+        @keyframes pulse-green {
+            0%, 100% { background-color: #10b981; }
+            50% { background-color: #34d399; }
+        }
+        .copy-success {
+            animation: pulse-green 1s ease-in-out;
+        }
+
+        /* Loading Spinner Animation */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border-left-color: #ec4899; /* Pink-500 */
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Fade in transition */
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans h-screen overflow-hidden flex flex-col md:flex-row">
+
+    <!-- Left Sidebar: Configuration Panel -->
+    <aside class="w-full md:w-[400px] lg:w-[450px] h-full flex flex-col bg-gray-800 border-r border-gray-700 shadow-2xl z-10 flex-shrink-0">
+        <!-- Sidebar Header -->
+        <div class="p-6 border-b border-gray-700 bg-gray-800/95 sticky top-0 z-20 backdrop-blur-sm">
+            <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-1 flex items-center gap-2">
+                <svg class="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                AI Prompt Gen
+            </h1>
+            <p class="text-xs text-gray-400">Configure parameters for Looping Video Generation</p>
+        </div>
+
+        <!-- Sidebar Scrollable Form -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-8">
+            <form id="generatorForm" class="space-y-8">
+                
+                <!-- Project Info Section -->
+                <div class="space-y-4">
+                    <h3 class="text-sm uppercase tracking-wider font-bold text-gray-500 mb-2">Project Info</h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Music Style</label>
+                            <input type="text" id="musicStyle" value="Arabic Music" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Genres</label>
+                            <input type="text" id="genres" value="R&B, Deep House" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500 transition-colors">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Aspect Ratio</label>
+                            <input type="text" id="aspectRatio" value="16:9" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-center text-white focus:outline-none focus:border-pink-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Resolution</label>
+                            <input type="text" id="resolution" value="3840x2160" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-center text-white focus:outline-none focus:border-pink-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">FPS</label>
+                            <input type="number" id="fps" value="60" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-center text-white focus:outline-none focus:border-pink-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Layers Section -->
+                <div class="space-y-4">
+                    <h3 class="text-sm uppercase tracking-wider font-bold text-gray-500 mb-2">Visual Settings</h3>
+                    
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Background Mode (Effect)</label>
+                        <select id="bgMode" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500 transition-colors cursor-pointer appearance-none">
+                            <option value="gambar_kejut (Beat-Synced Bass Shake / Shock Zoom)">Beat-Synced Bass Shake / Shock Zoom (Gambar Kejut)</option>
+                            <option value="subtle_pulse (Gentle Rhythmic Breathing)">Gentle Rhythmic Breathing (Subtle Pulse)</option>
+                            <option value="cinematic_pan (Slow Horizontal Drift)">Slow Horizontal Drift (Cinematic Pan)</option>
+                            <option value="parallax_stars (Deep Space Movement)">Deep Space Movement (Parallax Stars)</option>
+                            <option value="glitch_stutter (Digital Glitch on Beat)">Digital Glitch on Beat (Glitch Stutter)</option>
+                            <option value="kaleidoscope_spin (Slow Hypnotic Rotation)">Slow Hypnotic Rotation (Kaleidoscope Spin)</option>
+                            <option value="dolly_zoom (Vertigo Effect / Push-Pull)">Vertigo Effect / Push-Pull (Dolly Zoom)</option>
+                            <option value="audio_reactive_flash (Subtle Strobe on Kick)">Subtle Strobe on Kick (Audio Reactive Flash)</option>
+                            <option value="floating_camera (Handheld Float / Drift)">Handheld Float / Drift (Floating Camera)</option>
+                            <option value="time_lapse_fast (Speed Ramp Motion)">Speed Ramp Motion (Time Lapse Fast)</option>
+                            <option value="liquid_morph (Wavy Distortion on Bass)">Wavy Distortion on Bass (Liquid Morph)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Visual Effect</label>
+                        <select id="visualEffect" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500 transition-colors cursor-pointer appearance-none">
+                            <option value="Sparkling Love">Sparkling Love (Hearts & Bokeh)</option>
+                            <option value="Cyber Rain">Cyber Rain (Matrix Matrix Drops)</option>
+                            <option value="Golden Dust">Golden Dust (Floating Fairy Particles)</option>
+                            <option value="Smoke Wisps">Smoke Wisps (Trailing Colored Fog)</option>
+                            <option value="Neon Lasers">Neon Lasers (Sweeping Club Lights)</option>
+                            <option value="Floating Lanterns">Floating Lanterns (Warm Ambient Glow)</option>
+                            <option value="Raindrops on Glass">Raindrops on Glass (Cinematic Moody)</option>
+                            <option value="VHS Static">VHS Static (Retro Analog Noise)</option>
+                            <option value="Ethereal Butterflies">Ethereal Butterflies (Glowing Winged Insects)</option>
+                            <option value="Cosmic Nebula">Cosmic Nebula (Swirling Galaxy Dust)</option>
+                            <option value="Burning Embers">Burning Embers (Rising Ash & Fire)</option>
+                            <option value="Blowing Snow">Blowing Snow (Winter Chill Particles)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Spectrum Style</label>
+                        <select id="spectrumStyle" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500 transition-colors cursor-pointer appearance-none">
+                            <option value="Minimalist White Line">Minimalist White Line (Smooth Wave)</option>
+                            <option value="Neon Bars">Neon Bars (Classic EQ)</option>
+                            <option value="Circular Pulse">Circular Pulse (Radial Ring)</option>
+                            <option value="Fluid Blob">Fluid Blob (Organic Morphing Shape)</option>
+                            <option value="Symmetric Audio Wave">Symmetric Audio Wave (Mirrored Middle)</option>
+                            <option value="Double Helix">Double Helix (DNA style rotating EQ)</option>
+                            <option value="Glitchy Blocks">Glitchy Blocks (8-bit style bars)</option>
+                            <option value="Glowing Particles">Glowing Particles (Dust bouncing to beat)</option>
+                            <option value="Holographic Cylinder">Holographic Cylinder (3D rotating EQ)</option>
+                            <option value="Abstract Geometric Shapes">Abstract Geometric Shapes (Pulsing polygons)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Model Karakter</label>
+                        <select id="characterModel" class="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500 transition-colors cursor-pointer appearance-none">
+                            <option value="Tanpa Model">Tanpa Model (No Character)</option>
+                            <option value="Pria">Pria (Male Character)</option>
+                            <option value="Wanita">Wanita (Female Character)</option>
+                            <option value="Couple">Couple (Male & Female Characters)</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sidebar Footer (Sticky Generate Button) -->
+        <div class="p-6 border-t border-gray-700 bg-gray-800/95 backdrop-blur-sm mt-auto">
+            <button type="button" id="generateBtn" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg shadow-pink-500/30 transform transition hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-pink-500 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Generate JSON
+            </button>
+        </div>
+    </aside>
+
+    <!-- Right Main Panel: Result Display -->
+    <main class="flex-1 h-full bg-[#0d1117] flex flex-col p-4 md:p-8 relative overflow-hidden">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-100">Output JSON</h2>
+                <p class="text-sm text-gray-500">Ready to copy into your AI workflow</p>
+            </div>
+            <button id="copyBtn" class="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg transition-colors border border-gray-700 focus:outline-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                <span id="copyText" class="text-sm font-medium">Copy</span>
+            </button>
+        </div>
+        
+        <!-- Output Container (Relative for Loader overlay) -->
+        <div class="flex-1 relative rounded-xl overflow-hidden border border-gray-800 bg-gray-900 shadow-inner flex flex-col">
+            
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay" class="absolute inset-0 bg-gray-900/90 backdrop-blur-sm z-10 hidden flex-col items-center justify-center transition-opacity duration-300">
+                <div class="spinner mb-4"></div>
+                <h3 class="text-lg font-semibold text-pink-400 mb-1">Generating Prompt...</h3>
+                <p class="text-sm text-gray-500">Assembling 4 random texts & parameters</p>
+            </div>
+
+            <!-- Code Display -->
+            <pre id="jsonOutput" class="flex-1 p-6 text-sm text-green-400 overflow-auto font-mono whitespace-pre-wrap break-words leading-relaxed fade-enter-active"></pre>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Setup Virtual Manifest.json
+            const manifestData = {
+                "name": "JSON Prompt Gen Pro",
+                "short_name": "PromptGen",
+                "description": "Generate AI Video Prompts easily",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#111827",
+                "theme_color": "#1f2937",
+                "icons": [
+                    {
+                        "src": "https://placehold.co/192x192/ec4899/ffffff?text=PG",
+                        "sizes": "192x192",
+                        "type": "image/png"
+                    },
+                    {
+                        "src": "https://placehold.co/512x512/ec4899/ffffff?text=PG",
+                        "sizes": "512x512",
+                        "type": "image/png"
+                    }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            document.getElementById('manifest-link').setAttribute('href', manifestUrl);
+
+            // 2. Setup Virtual Service Worker
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'prompt-gen-v1';
+                    self.addEventListener('install', (event) => {
+                        self.skipWaiting();
+                        console.log('[ServiceWorker] Install');
+                    });
+                    self.addEventListener('activate', (event) => {
+                        console.log('[ServiceWorker] Activate');
+                        return self.clients.claim();
+                    });
+                    self.addEventListener('fetch', (event) => {
+                        // Simple network-first strategy for preview purposes
+                        event.respondWith(fetch(event.request).catch(() => new Response('Offline mode not fully supported in virtual preview.')));
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(registration => {
+                        console.log('Service Worker registered successfully with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            }
+
+            const generateBtn = document.getElementById('generateBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const jsonOutput = document.getElementById('jsonOutput');
+            const copyText = document.getElementById('copyText');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            const getDynamicTheme = (style, genre) => {
+                const keywords = (style + " " + genre).toLowerCase();
+                
+                if (keywords.includes('arabic') || keywords.includes('middle east')) {
+                    return "mysterious luxury Arabian night lounge with warm golden and deep magenta ambient lighting";
+                } else if (keywords.includes('synth') || keywords.includes('cyberpunk') || keywords.includes('retro')) {
+                    return "futuristic neon-lit cyberpunk cityscape with vibrant purple, cyan, and glowing pink accents";
+                } else if (keywords.includes('lofi') || keywords.includes('chill') || keywords.includes('relax')) {
+                    return "cozy aesthetic anime-style bedroom at twilight with warm string lights and soft pastel sunset colors";
+                } else if (keywords.includes('jazz') || keywords.includes('blues')) {
+                    return "dimly lit vintage underground jazz club with smoky atmosphere and warm tungsten spotlighting";
+                } else if (keywords.includes('edm') || keywords.includes('house') || keywords.includes('techno') || keywords.includes('trance')) {
+                    return "underground rave warehouse or massive festival stage with intense laser lights, strobe effects, and deep bass-reactive lighting";
+                } else if (keywords.includes('rock') || keywords.includes('metal')) {
+                    return "gritty industrial warehouse with heavy shadows, pyrotechnics, and intense red and white flashing lights";
+                } else if (keywords.includes('classical') || keywords.includes('orchestral') || keywords.includes('piano')) {
+                    return "grand opulent concert hall with elegant chandeliers and soft golden architectural lighting";
+                } else if (keywords.includes('ambient') || keywords.includes('nature') || keywords.includes('meditation')) {
+                    return "ethereal misty forest or serene zen garden with glowing bioluminescent plants and soft moonlight";
+                } else if (keywords.includes('pop')) {
+                    return "vibrant abstract modern studio set with colorful pastel gradients and soft studio softbox lighting";
+                }
+                
+                // Fallback for unknown styles
+                return "immersive abstract visualizer environment perfectly matching the music's aesthetic, with dynamic atmospheric mood lighting";
+            };
+
+            const getCharacterPrompt = (characterModel) => {
+                switch(characterModel) {
+                    case "Pria":
+                        return ", featuring a stylish male character relaxing in the center";
+                    case "Wanita":
+                        return ", featuring a beautiful female character listening to music in the scene";
+                    case "Couple":
+                        return ", featuring a romantic couple enjoying the vibe together";
+                    case "Tanpa Model":
+                    default:
+                        return ", empty scene focusing purely on the environment";
+                }
+            };
+
+            const generateJSONData = () => {
+                const musicStyle = document.getElementById('musicStyle').value;
+                const genresInput = document.getElementById('genres').value;
+                const genres = genresInput.split(',').map(g => g.trim()).filter(g => g);
+                
+                const bgMode = document.getElementById('bgMode').value;
+                const visualEffect = document.getElementById('visualEffect').value;
+                const spectrumStyle = document.getElementById('spectrumStyle').value;
+                const characterModel = document.getElementById('characterModel').value;
+
+                const dynamicTheme = getDynamicTheme(musicStyle, genresInput);
+                const characterPromptAddition = getCharacterPrompt(characterModel);
+
+                const data = {
+                    "project_info": {
+                        "type": "Looping Music Visualizer Video",
+                        "music_style": musicStyle,
+                        "genres": genres,
+                        "aspect_ratio": document.getElementById('aspectRatio').value,
+                        "resolution": document.getElementById('resolution').value,
+                        "fps": parseInt(document.getElementById('fps').value) || 60,
+                        "seamless_loop": true
+                    },
+                    "ai_video_prompt": {
+                        "positive_prompt": `Seamless looping music video background, ${musicStyle} ${genres.join(' ')} aesthetic, ${dynamicTheme}${characterPromptAddition}, dynamic camera bass-shake pulse effect, ${visualEffect.split('(')[0].trim().toLowerCase()}, ${spectrumStyle.split('(')[0].trim().toLowerCase()} spectrum at bottom, cinematic lighting, 8k resolution, photorealistic, high contrast, hypnotic vibe.`,
+                        "negative_prompt": "blurry, low quality, distorted waveform, cluttered screen, jarring cuts, non-looping, watermark, text, typography"
+                    },
+                    "visual_layers": {
+                        "background_mode": {
+                            "type": bgMode,
+                            "motion_curve": "Ease-out elastic synced to tempo"
+                        },
+                        "character_model": characterModel,
+                        "visual_effects": {
+                            "type": visualEffect,
+                            "blend_mode": "Screen / Add"
+                        },
+                        "audio_spectrum": {
+                            "type": spectrumStyle,
+                            "position": "Bottom horizontal"
+                        }
+                    }
+                };
+
+                return JSON.stringify(data, null, 2);
+            };
+
+            // Initial generation
+            jsonOutput.textContent = generateJSONData();
+
+            generateBtn.addEventListener('click', () => {
+                // Remove fade class briefly
+                jsonOutput.classList.remove('fade-enter-active');
+                jsonOutput.classList.add('fade-enter');
+                
+                // Show Loader
+                loadingOverlay.classList.remove('hidden');
+                loadingOverlay.classList.add('flex');
+
+                setTimeout(() => {
+                    // Generate new JSON
+                    const newJson = generateJSONData();
+                    jsonOutput.textContent = newJson;
+                    
+                    // Hide Loader
+                    loadingOverlay.classList.add('hidden');
+                    loadingOverlay.classList.remove('flex');
+
+                    // Apply fade in
+                    setTimeout(() => {
+                        jsonOutput.classList.add('fade-enter-active');
+                    }, 50);
+
+                }, 1200); // 1.2 second loading animation
+            });
+
+            copyBtn.addEventListener('click', () => {
+                const textToCopy = jsonOutput.textContent;
+                const textArea = document.createElement("textarea");
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    copyBtn.classList.add('copy-success', 'text-green-400', 'border-green-500');
+                    copyText.textContent = 'Copied!';
+                    
+                    setTimeout(() => {
+                        copyBtn.classList.remove('copy-success', 'text-green-400', 'border-green-500');
+                        copyText.textContent = 'Copy';
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy', err);
+                }
+                document.body.removeChild(textArea);
+            });
+        });
+    </script>
+</body>
+</html>
